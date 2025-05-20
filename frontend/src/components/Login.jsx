@@ -32,10 +32,13 @@ const LoginForm = () => {
   return (
     <div class="h-screen flex justify-center items-center">
         <div class="flex flex-wrap gap-4 max-w-xl p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-            <div class="flex flex-row w-full gap-8">
-                <div class="flex items-center">
+            <div class="flex flex-row w-full gap-8 items-center">
+                <div class="flex flex-col gap-8">
                     <h5 class="text-6xl font-bold tracking-tight text-gray-900 dark:text-white">
                         TugasIn
+                    </h5>
+                    <h5 class="text-lg font tracking-tight text-gray-900 dark:text-white">
+                        Catat, Lacak, Selesaikan Proyekmu
                     </h5>
                 </div>
 
