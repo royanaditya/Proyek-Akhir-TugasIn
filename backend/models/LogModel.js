@@ -1,0 +1,28 @@
+import { DataTypes } from "sequelize";
+import db from "../configs/Database.js";
+
+const Logs = db.define("Task",{
+    id:{
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+    },
+    description:{
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    logDate:{
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+    },
+    userId:{
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+    taskId:{
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+});
+
+export default Logs;
