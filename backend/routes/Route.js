@@ -1,15 +1,18 @@
 import express from "express";
-import { Register, Login, logout } from "../controllers/UsersController.js";
+import { Register, Login, logout, getProfilePicture, updateProfilePicture } from "../controllers/UsersController.js";
 import { verifyToken } from "../middleware/Verifytoken.js";
 import { getAccessToken } from "../controllers/TokenController.js";
 import { getAllTask, addTask, updateTask, deleteTask } from "../controllers/TasksController.js";
 import { getAllLogs, addLogs, updateLogs, deleteLogs } from "../controllers/LogsController.js";
+import upload from "../middleware/multer.js";
 
 const router = express.Router();
 
 router.get("/token", getAccessToken);
 
 // User Routes
+router.get("/get-profile", verifyToken, getProfilePicture);
+router.post("/update-profile", verifyToken, upload.single("picture"), updateProfilePicture);
 router.post("/register", Register);
 router.post("/login", Login);
 router.delete("/logout", logout);

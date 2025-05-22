@@ -15,6 +15,10 @@ const Users = db.define("User",{
         type: DataTypes.STRING,
         allowNull: false,
     },
+    gender:{
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     birthDate:{
         type: DataTypes.DATEONLY,
         allowNull: false,

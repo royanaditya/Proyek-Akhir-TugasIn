@@ -1,9 +1,11 @@
 import Users from "../models/UserModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import cloudinary from "../configs/Cloudinary.js";
+import streamifier from 'streamifier';
 
 export const Register = async (req, res) => {
-  const { username, password, confirm_password, date } = req.body;
+  const { username, password, confirm_password, gender, date } = req.body;
 
   // Password Validation
   if (password !== confirm_password) {
@@ -17,6 +19,7 @@ export const Register = async (req, res) => {
     const data = await Users.create({
       username: username,
       password: hashPassword,
+      gender: gender,
       birthDate: date
     });
 
@@ -50,12 +53,12 @@ export const Login = async (req, res) => {
 
     // JWT Sign
     const accessToken = jwt.sign(
-      { id: user.id, username: user.username, birthDate: user.birthDate },
+      { id: user.id, username: user.username, gender:user.gender, birthDate: user.birthDate },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: "30s" }
     );
     const refreshToken = jwt.sign(
-      { id: user.id, username: user.username, birthDate: user.birthDate },
+      { id: user.id, username: user.username, gender:user.gender, birthDate: user.birthDate },
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: "1d" }
     );
@@ -140,3 +143,80 @@ export const logout = async (req, res) => {
     });
   }
 };
+
+export const getProfilePicture = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const response = await Tasks.findAll({
+      where:{
+        idUser: userId
+      }
+    });
+
+    res.status(201).json({
+      message: "Data Profile Berhasil Diambil!",
+      response,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Terjadi Kesalahan",
+      error: error.message,
+    });
+  }
+};
+
+export const updateProfilePicture = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Cek apakah user ada
+    const user = await Users.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User tidak ditemukan" });
+    }
+
+    const { username, gender, birthDate } = req.body;
+    const updateData = {};
+
+    if (username) updateData.username = username;
+    if (birthDate) updateData.birthDate = birthDate;
+    if (gender) updateData.gender = gender;
+
+    if (req.file) {
+      const uploadFromBuffer = (buffer) => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "profile_pictures" },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result);
+            }
+          );
+          streamifier.createReadStream(buffer).pipe(stream);
+        });
+      };
+
+      const result = await uploadFromBuffer(req.file.buffer);
+      updateData.picture = result.secure_url;
+    }
+
+    // Jalankan update menggunakan Sequelize
+    await Users.update(updateData, {
+      where: { id: userId },
+    });
+
+    // Ambil data terbaru setelah update
+    const updatedUser = await Users.findByPk(userId, {
+      attributes: ["id", "username", "gender", "birthDate", "picture"],
+    });
+
+    res.json({
+      message: "Profil berhasil diperbarui",
+      user: updatedUser,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Gagal update profil", error: err.message });
+  }
+};
+
