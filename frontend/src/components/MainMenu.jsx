@@ -101,7 +101,7 @@ const MainMenu = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gray-200 relative">
+    <div className="min-h-screen w-full bg-white relative p-0">
       {/* Hamburger Button */}
       <button
         className="fixed top-4 left-4 z-50 text-3xl text-black bg-white rounded-md p-2 shadow"
