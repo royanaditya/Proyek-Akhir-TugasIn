@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
 import { BASE_URL } from '../utils/utils';
-import { FaBars, FaUserCircle, FaSignOutAlt, FaPlus } from 'react-icons/fa';
+import { FaBars, FaUserCircle, FaSignOutAlt, FaPlus, FaUserEdit } from 'react-icons/fa';
 
 const MainMenu = () => {
   const [token, setToken] = useState("");
@@ -76,6 +76,7 @@ const MainMenu = () => {
     if (token) {
       fetchTasks();
     }
+    // eslint-disable-next-line
   }, [token]);
 
   const fetchTasks = async () => {
@@ -107,37 +108,75 @@ const MainMenu = () => {
     navigate('/task', { state: { task } });
   };
 
+  // Menuju detail tugas
   const handleDetail = (task) => {
     navigate('/task-detail', { state: { task } });
   };
 
+  // Menuju edit profile
+  const handleEditProfile = () => {
+    navigate('/edit-profile', { state: { user } });
+    setSidebarOpen(false);
+  };
+
+  // Sapaan sesuai gender
+  const getSalutation = () => {
+    if (user.gender?.toLowerCase() === "male" || user.gender?.toLowerCase() === "laki-laki") {
+      return `Mr. ${user.username}`;
+    } else if (user.gender?.toLowerCase() === "female" || user.gender?.toLowerCase() === "perempuan") {
+      return `Mrs. ${user.username}`;
+    } else {
+      return user.username || "-";
+    }
+  };
+
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-30 bg-blue-800 text-white w-64 p-6 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out md:relative md:translate-x-0`}>
-        <h2 className="text-xl font-bold mb-4">Tugasin</h2>
-        <div className="flex flex-col items-center gap-2 mb-6">
-          <FaUserCircle size={64} />
-          <p className="font-semibold text-lg">Profile</p>
-          <p>Nama: {user.username || '-'}</p>
-          <p>Gender: {user.gender || '-'}</p>
-          <p>Tanggal Lahir: {user.birthDate || '-'}</p>
+    <div className="min-h-screen w-full bg-gray-200 relative">
+      {/* Hamburger Button */}
+      <button
+        className="fixed top-4 left-4 z-50 text-3xl text-black bg-white rounded-md p-2 shadow"
+        onClick={() => setSidebarOpen(true)}
+      >
+        <FaBars />
+      </button>
+
+      {/* Sidebar Drawer */}
+      {sidebarOpen && (
+        <div>
+          <div className="fixed top-0 left-0 z-50 h-full w-64 bg-blue-800 text-white p-6 shadow-lg transition-transform duration-300">
+            <button
+              className="absolute top-4 right-4 text-2xl text-white"
+              onClick={() => setSidebarOpen(false)}
+            >
+              ×
+            </button>
+            <h2 className="text-xl font-bold mb-4">Tugasin</h2>
+            <div className="flex flex-col items-center gap-2 mb-6">
+              <FaUserCircle size={64} />
+              <p className="font-semibold text-lg">Profile</p>
+              <p>Nama: {user.username || '-'}</p>
+              <p>Gender: {user.gender || '-'}</p>
+              <p>Tanggal Lahir: {user.birthDate || '-'}</p>
+            </div>
+            <button
+              onClick={handleEditProfile}
+              className="flex items-center gap-2 text-white font-semibold hover:text-yellow-300 mb-4"
+            >
+              <FaUserEdit /> Edit Profile
+            </button>
+            <button onClick={Logout} className="flex items-center gap-2 text-white font-semibold hover:text-red-300">
+              <FaSignOutAlt /> Logout
+            </button>
+          </div>
         </div>
-        <button onClick={Logout} className="flex items-center gap-2 text-white font-semibold hover:text-red-300">
-          <FaSignOutAlt /> Logout
-        </button>
-      </div>
+      )}
 
       {/* Main Content */}
-      <div className="flex-1 p-6 overflow-auto">
-        <button
-          className="fixed top-4 left-4 z-40 text-3xl text-black md:hidden bg-white rounded-md p-2 shadow"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-        >
-          <FaBars />
-        </button>
-
-        <h1 className="text-3xl font-bold mb-4">Welcome! Mr./Mrs.</h1>
+      <div
+        className={`p-6 w-full transition-transform duration-300 ${sidebarOpen ? 'translate-x-64' : ''}`}
+        style={{ minHeight: '100vh' }}
+      >
+        <h1 className="text-3xl font-bold mb-4">Welcome! {getSalutation()}</h1>
         <h2 className="text-xl font-semibold mb-4">Tugas Anda</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import LogSection from "./LogSection";
@@ -5,12 +6,16 @@ import LogSection from "./LogSection";
 const TaskDetail = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const task = location.state?.task;
+  const task = location.state?.task || JSON.parse(localStorage.getItem("selectedTask"));
 
   if (!task) {
     return (
       <div className="p-6">
-        <p>Task tidak ditemukan. Kembali ke <button className="text-blue-600 underline" onClick={() => navigate("/mainmenu")}>menu</button>.</p>
+        <p>Task tidak ditemukan. Silakan kembali ke{" "}
+          <button className="text-blue-600 underline" onClick={() => navigate("/mainmenu")}>
+            menu utama
+          </button>.
+        </p>
       </div>
     );
   }
