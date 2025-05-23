@@ -1,82 +1,83 @@
-import Tasks from "../models/TaskModel";
+import Tasks from "../models/TaskModel.js";
 
-// GET
-async function getAllTask(req, res) {
+export const getAllTask = async (req, res) => {
   try {
     const userId = req.user.id;
     const response = await Tasks.findAll({
-      where:{
-        idUser: userId
-      }
+      where: { userId }
     });
     res.status(200).json(response);
   } catch (error) {
-    console.log(error.message);
+    console.error("❌ Gagal ambil tugas:", error);
+    res.status(500).json({ msg: "Gagal mengambil data tugas" });
   }
-}
+};
 
-// CREATE
-async function addTask(req, res) {
+export const addTask = async (req, res) => {
   try {
-    const { title, description, startDate, endDate } = req.body;
+    const { title, description, startDate, endDate, status } = req.body;
     const userId = req.user.id;
+
     await Tasks.create({
-      title: title,
-      description: description,
-      startDate: startDate,
-      endDate: endDate,
-      userId: userId
+      title,
+      description,
+      startDate,
+      endDate,
+      status: status || "To Do",
+      userId
     });
-    res.status(201).json({ msg: "Task Created" });
+
+    res.status(201).json({ msg: "Task berhasil dibuat" });
   } catch (error) {
-    console.log(error.message);
+    console.error("❌ Gagal tambah tugas:", error);
+    res.status(500).json({ msg: "Gagal membuat tugas" });
   }
-}
+};
 
-async function updateTask(req, res){
-  try{
-    const updatedTask = req.body;
-    const task = await Tasks.update(
-      updatedTask,
-      {
-        where: {
-          id : req.params.id,
-          userId : req.user.id
-        }
-      }
-    )
-
-    if (!task) {
-        return res.status(404).json({ message: "Task tidak ditemukan" });
-    }
-
-    res.status(201).json({ msg: "Task Updated" });
-  }catch(error){
-    console.log(error.message);
-  }
-}
-  
-async function deleteTask(req, res){
-  try{
-    const taskId = req.params.id;
+export const updateTask = async (req, res) => {
+  try {
+    const { id, title, description, startDate, endDate, status } = req.body;
     const userId = req.user.id;
-    const task = await Tasks.destroy(
-      {
-        where: {
-          id: taskId,
-          userId: userId
-        }
-      }
-    )
 
-    if (!task) {
-        return res.status(404).json({ message: "Task tidak ditemukan" });
+    if (!id) return res.status(400).json({ msg: "ID tidak boleh kosong" });
+
+    const [updated] = await Tasks.update(
+      { title, description, startDate, endDate, status },
+      { where: { id, userId } }
+    );
+
+    if (updated === 0) {
+      return res.status(404).json({ msg: "Tugas tidak ditemukan atau bukan milik Anda" });
     }
 
-    res.status(201).json({ msg: "Task Deleted" });
-  }catch(error){
-    console.log(error.message);
+    res.status(200).json({ msg: "Tugas berhasil diperbarui" });
+  } catch (error) {
+    console.error("❌ Gagal update tugas:", error.message);
+    res.status(500).json({ msg: "Gagal update tugas" });
   }
-}
+};
 
-export { getAllTask, addTask, updateTask, deleteTask };
+export const deleteTask = async (req, res) => {
+  try {
+    const taskId = req.query.id;
+    const userId = req.user.id;
+
+    if (!taskId) {
+      return res.status(400).json({ msg: "ID tidak ditemukan" });
+    }
+
+    const deleted = await Tasks.destroy({
+      where: { id: taskId, userId }
+    });
+
+    if (deleted === 0) {
+      return res.status(404).json({ msg: "Tugas tidak ditemukan atau bukan milik Anda" });
+    }
+
+    res.status(200).json({ msg: "Tugas berhasil dihapus" });
+  } catch (error) {
+    console.error("❌ Gagal hapus tugas:", error.message);
+    res.status(500).json({ msg: "Gagal menghapus tugas" });
+  }
+};
+
