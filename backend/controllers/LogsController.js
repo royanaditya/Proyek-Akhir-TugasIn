@@ -1,4 +1,4 @@
-import Logs from "../models/LogModel";
+import Logs from "../models/LogModel.js";
 
 // GET
 async function getAllLogs(req, res) {

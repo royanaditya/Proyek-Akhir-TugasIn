@@ -4,7 +4,14 @@
   padding: 2rem;
   text-align: center;
 }
-
+html, body, #root {
+  height: 100%;
+  background-color: #e5e7eb; /* Tailwind bg-gray-200 */
+}
+body {
+  margin: 0;
+  padding: 0;
+}
 .logo {
   height: 6em;
   padding: 1.5em;
