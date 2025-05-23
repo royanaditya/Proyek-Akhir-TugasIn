@@ -29,9 +29,7 @@ const LogSection = ({ taskId }) => {
 
   const fetchLogs = async () => {
     try {
-      const res = await axiosJWT.get("/get-all-log", {
-        data: { taskId },
-      });
+      const res = await axiosJWT.get(`/get-all-log?taskId=${taskId}`);
       setLogs(res.data);
     } catch (err) {
       console.error("Gagal ambil log:", err);

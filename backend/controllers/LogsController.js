@@ -3,7 +3,7 @@ import Logs from "../models/LogModel.js";
 // GET
 async function getAllLogs(req, res) {
   try {
-    const taskId = req.body;
+    const taskId = req.query.taskId;
     const response = await Logs.findAll({
       where:{
         taskId: taskId
