@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
 import { BASE_URL } from '../utils/utils';
-import { FaBars, FaUserCircle, FaSignOutAlt, FaPlus } from 'react-icons/fa';
+import { FaBars, FaUserCircle, FaSignOutAlt, FaPlus, FaAddressCard } from 'react-icons/fa';
 
 const MainMenu = () => {
   const [token, setToken] = useState("");
@@ -127,6 +127,9 @@ const MainMenu = () => {
           <p>Gender: {user.gender || '-'}</p>
           <p>Tanggal Lahir: {user.birthDate || '-'}</p>
         </div>
+        <button onClick={()=>{}} className="flex items-center gap-2 text-white font-semibold hover:text-red-300">
+          <FaAddressCard /> Edit Profile
+        </button>
         <button onClick={Logout} className="flex items-center gap-2 text-white font-semibold hover:text-red-300">
           <FaSignOutAlt /> Logout
         </button>
