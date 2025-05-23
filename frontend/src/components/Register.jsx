@@ -7,6 +7,7 @@ const RegisterForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [gender, setGender] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ const RegisterForm = () => {
       const response = await axios.post(`${BASE_URL}/register`, {
         username: username,
         password: password,
+        gender: gender,
         confirm_password: confirmPassword,
         date: birthDate
       });
@@ -87,11 +89,11 @@ const RegisterForm = () => {
                 
                 <label for="gender" class="text-start block mb-2 text-sm font-medium text-gray-900 dark:text-white">Gender</label>
                 <div class="flex items-center ps-4 border border-gray-200 rounded-sm dark:border-gray-700">
-                    <input id="bordered-radio-1" type="radio" value="male" name="bordered-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
+                    <input id="bordered-radio-1" type="radio" value="male" name="bordered-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" onChange={(e) => setGender(e.target.value)}/>
                     <label for="bordered-radio-1" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Male</label>
                 </div>
                 <div class="flex items-center ps-4 border border-gray-200 rounded-sm dark:border-gray-700 mb-5">
-                    <input id="bordered-radio-2" type="radio" value="female" name="bordered-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
+                    <input id="bordered-radio-2" type="radio" value="female" name="bordered-radio" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" onChange={(e) => setGender(e.target.value)}/>
                     <label for="bordered-radio-2" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Female</label>
                 </div>
 
