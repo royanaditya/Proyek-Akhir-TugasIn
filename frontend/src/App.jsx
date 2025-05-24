@@ -5,6 +5,8 @@ import RegisterForm from './components/Register';
 import MainMenu from './components/MainMenu';
 import TaskPage from './components/TaskPage'; 
 import ProfilePage from "./components/ProfilePage";
+import TaskDetail from './components/TaskDetail';
+
 
 function App() {
   return (
@@ -15,6 +17,7 @@ function App() {
         <Route path="/mainmenu" element={<MainMenu/>}/>
         <Route path="/task" element={<TaskPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/task-detail" element={<TaskDetail />} />
       </Routes>
     </BrowserRouter>
   )
