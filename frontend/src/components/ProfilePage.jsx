@@ -1,84 +1,131 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 import { BASE_URL } from "../utils/utils";
 
 const ProfilePage = () => {
-  const [profile, setProfile] = useState({
-    username: "",
-    gender: "",
-    birthDate: "",
-    picture: "",
-  });
+  const navigate = useNavigate();
+  const [token, setToken] = useState("");
+  const [expire, setExpire] = useState("");
+  const [user, setUser] = useState({ username: '', gender: '', birthDate: '', picture: ''});
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  const axiosJWT = axios.create({
-    baseURL: BASE_URL,
-    withCredentials: true,
-  });
-
-  // Refresh token otomatis
-  axiosJWT.interceptors.request.use(
-    async (config) => {
-      const res = await axios.get(`${BASE_URL}/token`, { withCredentials: true });
-      config.headers.Authorization = `Bearer ${res.data.accessToken}`;
-      return config;
-    },
-    (error) => Promise.reject(error)
+  const axiosJWT = useRef(
+    axios.create({ baseURL: BASE_URL, withCredentials: true })
   );
 
-  const fetchProfile = async () => {
-    try {
-      const res = await axiosJWT.get("/get-profile");
-      const data = res.data.response[0];
-      setProfile({
-        username: data.username || "",
-        gender: data.gender || "",
-        birthDate: data.birthDate || "",
-        picture: data.picture || "",
-      });
-      setPreview(data.picture || null);
-    } catch (err) {
-      console.error("Gagal ambil profil:", err);
-    }
-  };
+  // Set up Axios interceptor
+  useEffect(() => {
+    const interceptor = axiosJWT.current.interceptors.request.use(
+      async (config) => {
+        const now = new Date().getTime();
+        if (expire && expire * 1000 < now) {
+          const response = await axios.get(`${BASE_URL}/token`, { withCredentials: true });
+          const newToken = response.data.accessToken;
+          config.headers.Authorization = `Bearer ${newToken}`;
+          setToken(newToken);
+          const decoded = jwtDecode(newToken);
+          setExpire(decoded.exp);
+          setUser({
+            username: decoded.username,
+            gender: decoded.gender,
+            birthDate: decoded.birthDate,
+            picture: decoded.picture
+          });
+        } else {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error) => {
+        setToken("");
+        navigate("/");
+        return Promise.reject(error);
+      }
+    );
+    return () => {
+      axiosJWT.current.interceptors.request.eject(interceptor);
+    };
+  }, [expire, token, navigate]);
+
+  // Refresh token saat mount
+  useEffect(() => {
+    const refreshToken = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/token`, { withCredentials: true });
+        const accessToken = response.data.accessToken;
+        setToken(accessToken);
+        const decoded = jwtDecode(accessToken);
+        setExpire(decoded.exp);
+        setUser({
+          username: decoded.username,
+          gender: decoded.gender,
+          birthDate: decoded.birthDate,
+          picture: decoded.picture
+        });
+
+        setPreview(decoded.picture);
+      } catch {
+        navigate("/");
+      }
+    };
+    refreshToken();
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append("username", profile.username);
-    formData.append("gender", profile.gender);
-    formData.append("birthDate", profile.birthDate);
+    formData.append("username", user.username);
+    formData.append("gender", user.gender);
+    formData.append("birthDate", user.birthDate);
     if (selectedFile) formData.append("picture", selectedFile);
 
     try {
-      await axiosJWT.post("/update-profile", formData, {
+      await axiosJWT.current.post("/update-profile", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      alert("Profil berhasil diperbarui!");
-      fetchProfile();
+      alert("Profil berhasil diperbarui!")
+      navigate("/mainmenu")
     } catch (err) {
       console.error("Gagal update profil:", err);
     }
   };
-
-  useEffect(() => {
-    fetchProfile();
-  }, []);
 
   return (
     <div className="max-w-xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Edit Profil</h1>
       <form onSubmit={handleSubmit} className="space-y-4 bg-white p-4 shadow rounded">
 
+        <div className="flex flex-col items-center gap-4">
+          <label className="block font-medium">Foto Profil</label>
+          {preview && (
+            <img
+              src={preview}
+              alt="Preview"
+              className="mt-2 w-32 h-32 object-cover rounded-full"
+            />
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              setSelectedFile(e.target.files[0]);
+              setPreview(URL.createObjectURL(e.target.files[0]));
+            }}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+
         <div>
           <label className="block font-medium">Username</label>
           <input
             type="text"
-            value={profile.username}
-            onChange={(e) => setProfile({ ...profile, username: e.target.value })}
+            value={user.username}
+            onChange={(e) => setUser({ ...user, username: e.target.value })}
             className="w-full border p-2 rounded"
             required
           />
@@ -87,8 +134,8 @@ const ProfilePage = () => {
         <div>
           <label className="block font-medium">Gender</label>
           <select
-            value={profile.gender}
-            onChange={(e) => setProfile({ ...profile, gender: e.target.value })}
+            value={user.gender}
+            onChange={(e) => setUser({ ...user, gender: e.target.value })}
             className="w-full border p-2 rounded"
             required
           >
@@ -102,38 +149,25 @@ const ProfilePage = () => {
           <label className="block font-medium">Tanggal Lahir</label>
           <input
             type="date"
-            value={profile.birthDate}
-            onChange={(e) => setProfile({ ...profile, birthDate: e.target.value })}
+            value={user.birthDate}
+            onChange={(e) => setUser({ ...user, birthDate: e.target.value })}
             className="w-full border p-2 rounded"
             required
           />
         </div>
 
-        <div>
-          <label className="block font-medium">Foto Profil</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              setSelectedFile(e.target.files[0]);
-              setPreview(URL.createObjectURL(e.target.files[0]));
-            }}
-            className="w-full border p-2 rounded"
-          />
-          {preview && (
-            <img
-              src={preview}
-              alt="Preview"
-              className="mt-2 w-32 h-32 object-cover rounded-full"
-            />
-          )}
-        </div>
-
         <button
           type="submit"
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded me-4"
         >
           Simpan Perubahan
+        </button>
+        <button
+          type="button"
+          className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded"
+          onClick={()=>{navigate("/mainmenu")}}
+        >
+          Batal
         </button>
       </form>
     </div>

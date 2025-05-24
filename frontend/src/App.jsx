@@ -16,7 +16,7 @@ function App() {
         <Route path="/register" element={<RegisterForm/>}/>
         <Route path="/mainmenu" element={<MainMenu/>}/>
         <Route path="/task" element={<TaskPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/edit-profile" element={<ProfilePage />} />
         <Route path="/task-detail" element={<TaskDetail />} />
       </Routes>
     </BrowserRouter>

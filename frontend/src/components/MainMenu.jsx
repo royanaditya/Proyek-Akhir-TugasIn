@@ -8,7 +8,7 @@ import { FaBars, FaUserCircle, FaSignOutAlt, FaPlus, FaUserEdit } from 'react-ic
 const MainMenu = () => {
   const [token, setToken] = useState("");
   const [expire, setExpire] = useState("");
-  const [user, setUser] = useState({ username: '', gender: '', birthDate: '' });
+  const [user, setUser] = useState({ username: '', gender: '', birthDate: '', picture: ''});
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [tasks, setTasks] = useState([]);
   const navigate = useNavigate();
@@ -32,7 +32,8 @@ const MainMenu = () => {
           setUser({
             username: decoded.username,
             gender: decoded.gender,
-            birthDate: decoded.birthDate
+            birthDate: decoded.birthDate,
+            picture: decoded.picture
           });
         } else {
           config.headers.Authorization = `Bearer ${token}`;
@@ -62,7 +63,8 @@ const MainMenu = () => {
         setUser({
           username: decoded.username,
           gender: decoded.gender,
-          birthDate: decoded.birthDate
+          birthDate: decoded.birthDate,
+          picture: decoded.picture
         });
       } catch {
         navigate("/");
@@ -76,7 +78,7 @@ const MainMenu = () => {
     if (token) {
       fetchTasks();
     }
-    // eslint-disable-next-line
+    // eslint-disable-next-lines
   }, [token]);
 
   const fetchTasks = async () => {
@@ -152,7 +154,15 @@ const MainMenu = () => {
             </button>
             <h2 className="text-xl font-bold mb-4">Tugasin</h2>
             <div className="flex flex-col items-center gap-2 mb-6">
-              <FaUserCircle size={64} />
+            <img
+                src={user.picture||'https://st4.depositphotos.com/4329009/19956/v/450/depositphotos_199564354-stock-illustration-creative-vector-illustration-default-avatar.jpg'}
+                alt="Preview"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://st4.depositphotos.com/4329009/19956/v/450/depositphotos_199564354-stock-illustration-creative-vector-illustration-default-avatar.jpg';
+                }}
+                className="mt-2 w-32 h-32 object-cover rounded-full"
+              />
               <p className="font-semibold text-lg">Profile</p>
               <p>Nama: {user.username || '-'}</p>
               <p>Gender: {user.gender || '-'}</p>
