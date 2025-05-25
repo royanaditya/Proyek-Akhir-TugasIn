@@ -79,37 +79,53 @@ const TaskPage = () => {
   }, [token, expire]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      if (isUpdate) {
-        if (!editingId) {
-          alert("❌ ID tugas tidak ditemukan. Gagal update.");
-          setIsLoading(false);
-          return;
-        }
-        // Kirim id sesuai yang tersedia (id atau _id)
-        const payload = {
-          ...form,
-          id: editingId,
-        };
-        await axiosJWT.current.post("/update-task", payload);
-        alert("✅ Tugas berhasil diupdate!");
-      } else {
-        await axiosJWT.current.post("/add-task", form);
-        alert("✅ Tugas berhasil ditambahkan!");
-      }
-      setForm({ title: "", description: "", startDate: "", endDate: "", status: "To Do" });
-      setIsUpdate(false);
-      setEditingId(null);
-      navigate("/mainmenu");
-    } catch (err) {
-      alert("❌ Gagal menyimpan tugas.");
-      console.error("❌ Error:", err);
-    } finally {
-      setIsLoading(false);
+  e.preventDefault();
+  setIsLoading(true);
+  try {
+    // Ambil tanggal hari ini (tanpa jam)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Ambil tanggal deadline (tanpa jam)
+    const deadline = form.endDate ? new Date(form.endDate) : null;
+    if (deadline) deadline.setHours(0, 0, 0, 0);
+
+    let newStatus;
+    if (deadline && deadline < today) {
+      newStatus = "Overdue";
+    } else {
+      newStatus = form.status; // status sesuai pilihan user
     }
-  };
+
+    if (isUpdate) {
+      if (!editingId) {
+        alert("❌ ID tugas tidak ditemukan. Gagal update.");
+        setIsLoading(false);
+        return;
+      }
+      const payload = {
+        ...form,
+        status: newStatus,
+        id: editingId,
+      };
+      await axiosJWT.current.post("/update-task", payload);
+      alert("✅ Tugas berhasil diupdate!");
+    } else {
+      await axiosJWT.current.post("/add-task", { ...form, status: newStatus });
+      alert("✅ Tugas berhasil ditambahkan!");
+    }
+
+    setForm({ title: "", description: "", startDate: "", endDate: "", status: "To Do" });
+    setIsUpdate(false);
+    setEditingId(null);
+    navigate("/mainmenu");
+  } catch (err) {
+    alert("❌ Gagal menyimpan tugas.");
+    console.error("❌ Error:", err);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleCancel = () => {
     setForm({ title: "", description: "", startDate: "", endDate: "", status: "To Do" });
@@ -119,10 +135,46 @@ const TaskPage = () => {
   };
 
   useEffect(() => {
-    if (editingTask) {
-      console.log("🛠 Task yang akan diedit:", editingTask);
-    }
-  }, [editingTask]);
+  if (editingTask) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const deadline = editingTask.endDate ? new Date(editingTask.endDate) : null;
+    if (deadline) deadline.setHours(0, 0, 0, 0);
+
+    const isNowNotOverdue = deadline && deadline >= today;
+
+    setForm({
+      title: editingTask.title || "",
+      description: editingTask.description || "",
+      startDate: editingTask.startDate || "",
+      endDate: editingTask.endDate || "",
+      // Jika overdue dan deadline sudah tidak lewat hari ini, kembalikan ke status terakhir user (To Do/In Progress/Done)
+      status:
+        editingTask.status === "Overdue" && isNowNotOverdue
+          ? "To Do"
+          : editingTask.status || "To Do",
+    });
+  }
+}, [editingTask]);
+
+// 🔁 Auto-update status jika endDate diubah oleh user
+useEffect(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const deadline = form.endDate ? new Date(form.endDate) : null;
+  if (deadline) deadline.setHours(0, 0, 0, 0);
+
+  // Jika sebelumnya status Overdue dan deadline diganti ke hari ini atau masa depan
+  if (form.status === "Overdue" && deadline && deadline >= today) {
+    setForm((prevForm) => ({
+      ...prevForm,
+      status: "To Do", // default status jika bukan overdue lagi
+    }));
+  }
+}, [form.endDate]);
+
+
   useEffect(() => {
     if (editingId) {
       console.log("🛠 ID yang sedang diedit:", editingId);

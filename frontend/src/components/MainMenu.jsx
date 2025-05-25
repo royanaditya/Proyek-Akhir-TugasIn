@@ -194,6 +194,7 @@ const MainMenu = () => {
             let cardColor = "bg-gray-200";
             if (task.status === "In Progress") cardColor = "bg-yellow-200";
             else if (task.status === "Done") cardColor = "bg-green-200";
+            else if (task.status === "Overdue") cardColor = "bg-red-200";
             else if (task.status === "To Do") cardColor = "bg-gray-200";
             return (
               <div
