@@ -3,16 +3,14 @@ service: tugasin-fe
 instance_class: F1
 
 handlers:
-  - url: /static
-    static_dir: build/static
-
+  # Static assets (js, css, images)
   - url: /(.*\.(js|css|png|jpg|ico|json|map))
-    static_files: build/\1
-    upload: build/.*\.(js|css|png|jpg|ico|json|map)
+    static_files: dist/\1
+    upload: dist/.*\.(js|css|png|jpg|ico|json|map)
 
-  # ✅ Fallback handler: arahkan semua ke index.html agar React Router bisa handle route-nya
+  # All other URLs route to index.html for React Router
   - url: /.*
-    static_files: build/index.html
-    upload: build/index.html
+    static_files: dist/index.html
+    upload: dist/index.html
 
 default_expiration: "1h"

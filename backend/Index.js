@@ -14,7 +14,7 @@ const port = process.env.PORT || 5000;
 // Konfigurasi CORS agar mengizinkan domain frontend terdeploy
 const corsOptions = {
  origin: [
-    "https://notes-frontend-veriaw-dot-c-05-451109.ue.r.appspot.com",
+    "https://tugasin-fe-dot-c-05-451109.ue.r.appspot.com",
     "http://localhost:5173", // Tambahkan localhost untuk pengembangan lokal
   ], // Ganti dengan URL frontend yang terdeploy
   credentials: true, // Memungkinkan penggunaan cookies
