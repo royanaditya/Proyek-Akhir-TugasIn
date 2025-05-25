@@ -48,7 +48,7 @@ export const getAccessToken = async (req, res) => {
           const accessToken = jwt.sign(
             safeUserData,
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: "30s" }
+            { expiresIn: "15m" }
           );
 
           // Kirim respons sukses + kasih access token yg udah dibikin tadi
