@@ -77,13 +77,13 @@ export const Login = async (req, res) => {
       // - `true`: Cookie tidak bisa diakses via JavaScript (document.cookie)
       // - Mencegah serangan XSS (Cross-Site Scripting)
       // - Untuk development bisa `false` agar bisa diakses via console
-      httpOnly: true, // <- Untuk keperluan PRODUCTION wajib true
+      httpOnly: false, // <- Untuk keperluan PRODUCTION wajib true
 
       // sameSite:
       // - "strict": Cookie, hanya dikirim untuk request SAME SITE (domain yang sama)
       // - "lax": Cookie dikirim untuk navigasi GET antar domain (default)
       // - "none": Cookie dikirim untuk CROSS-SITE requests (butuh secure:true)
-      sameSite: "lax", // <- Untuk API yang diakses dari domain berbeda
+      sameSite: "none", // <- Untuk API yang diakses dari domain berbeda
 
       // maxAge:
       // - Masa aktif cookie dalam milidetik (1 hari = 24x60x60x1000)
@@ -94,7 +94,7 @@ export const Login = async (req, res) => {
       // - `true`: Cookie hanya dikirim via HTTPS
       // - Mencegah MITM (Man-in-the-Middle) attack
       // - WAJIB `true` jika sameSite: "none"
-      secure: false,
+      secure: true,
     });
 
     // Response
