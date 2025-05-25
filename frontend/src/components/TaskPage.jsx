@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { BASE_URL } from '../utils/utils';
+import { BASE_URL } from '../utils/Utils.js';
 import { jwtDecode } from 'jwt-decode';
 
 const TaskPage = () => {

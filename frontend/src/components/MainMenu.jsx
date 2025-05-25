@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
-import { BASE_URL } from '../utils/utils';
+import { BASE_URL } from '../utils/Utils.js';
 import { FaBars, FaUserCircle, FaSignOutAlt, FaPlus, FaUserEdit } from 'react-icons/fa';
 import banner from '../assets/banner.png';
 

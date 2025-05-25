@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { BASE_URL } from "../utils/utils";
+import { BASE_URL } from "../utils/Utils.js";
 
 const LogSection = ({ taskId }) => {
   const [logs, setLogs] = useState([]);

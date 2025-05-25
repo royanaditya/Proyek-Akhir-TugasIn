@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { BASE_URL } from "../utils/utils";
+import { BASE_URL } from "../utils/Utils.js";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "../utils/cropImage";
 
