@@ -1,6 +1,6 @@
 import express from "express";
 import { Register, Login, logout, getProfilePicture, updateProfilePicture } from "../controllers/UsersController.js";
-import { verifyToken } from "../middleware/Verifytoken.js";
+import { verifyToken } from "../middleware/verifyToken.js";
 import { getAccessToken } from "../controllers/TokenController.js";
 import { getAllTask, addTask, updateTask, deleteTask } from "../controllers/TasksController.js";
 import { getAllLogs, addLogs, updateLogs, deleteLogs } from "../controllers/LogsController.js";
