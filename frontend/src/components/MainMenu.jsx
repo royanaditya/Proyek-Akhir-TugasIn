@@ -4,6 +4,7 @@ import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
 import { BASE_URL } from '../utils/utils';
 import { FaBars, FaUserCircle, FaSignOutAlt, FaPlus, FaUserEdit } from 'react-icons/fa';
+import banner from '../assets/banner.png';
 
 const MainMenu = () => {
   const [token, setToken] = useState("");
@@ -187,6 +188,7 @@ const MainMenu = () => {
         style={{ minHeight: '100vh' }}
       >
         <h1 className="text-3xl font-bold mb-4">Welcome! {getSalutation()}</h1>
+        <img className="w-2/3 mx-auto" src={banner} alt='logo' />
         <h2 className="text-xl font-semibold mb-4">Tugas Anda</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
