@@ -210,7 +210,7 @@ export const updateProfilePicture = async (req, res) => {
       attributes: ["id", "username", "gender", "birthDate", "picture"],
     });
 
-    res.json({
+    res.status(200).json({
       message: "Profil berhasil diperbarui",
       user: updatedUser,
     });

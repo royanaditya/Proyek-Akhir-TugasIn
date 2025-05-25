@@ -183,7 +183,7 @@ const MainMenu = () => {
 
       {/* Main Content */}
       <div
-        className={`p-6 w-full transition-transform duration-300 ${sidebarOpen ? 'translate-x-64' : ''}`}
+        className={`p-6 transition-all duration-300 ${sidebarOpen ? 'ml-64 w-[calc(100%-16rem)]' : 'ml-0 w-full'}`}
         style={{ minHeight: '100vh' }}
       >
         <h1 className="text-3xl font-bold mb-4">Welcome! {getSalutation()}</h1>
