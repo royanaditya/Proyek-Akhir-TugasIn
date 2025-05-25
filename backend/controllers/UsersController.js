@@ -147,9 +147,9 @@ export const logout = async (req, res) => {
 export const getProfilePicture = async (req, res) => {
   try {
     const userId = req.user.id;
-    const response = await Tasks.findAll({
+    const response = await Users.findAll({
       where:{
-        idUser: userId
+        id: userId
       }
     });
 
