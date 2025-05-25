@@ -5,4 +5,4 @@ RUN npm install --production
 # --production = tanpa devDepedencies
 COPY . .
 EXPOSE 5000
-CMD ["node", "index.js"]
+CMD ["node", "Index.js"]
