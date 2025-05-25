@@ -1,0 +1,18 @@
+runtime: nodejs20
+service: tugasin-fe
+instance_class: F1
+
+handlers:
+  - url: /static
+    static_dir: build/static
+
+  - url: /(.*\.(js|css|png|jpg|ico|json|map))
+    static_files: build/\1
+    upload: build/.*\.(js|css|png|jpg|ico|json|map)
+
+  # ✅ Fallback handler: arahkan semua ke index.html agar React Router bisa handle route-nya
+  - url: /.*
+    static_files: build/index.html
+    upload: build/index.html
+
+default_expiration: "1h"
