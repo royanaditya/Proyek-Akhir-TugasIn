@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { BASE_URL } from "../utils/utils";
+import Cropper from "react-easy-crop";
+import getCroppedImg from "../utils/cropImage";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -10,8 +12,13 @@ const ProfilePage = () => {
   const [expire, setExpire] = useState("");
   const [user, setUser] = useState({ username: '', gender: '', birthDate: '', picture: ''});
 
-  const [selectedFile, setSelectedFile] = useState(null);
+   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [imageSrc, setImageSrc] = useState(null);
+  const [showCropper, setShowCropper] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
   const axiosJWT = useRef(
     axios.create({ baseURL: BASE_URL, withCredentials: true })
@@ -75,6 +82,25 @@ const ProfilePage = () => {
     refreshToken();
   }, [navigate]);
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImageSrc(reader.result);
+      setShowCropper(true);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCropSave = async () => {
+    const { file, url } = await getCroppedImg(imageSrc, croppedAreaPixels);
+    setSelectedFile(file);
+    setPreview(url);
+    setShowCropper(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -98,6 +124,39 @@ const ProfilePage = () => {
   return (
     <div className="max-w-xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Edit Profil</h1>
+
+      {showCropper && (
+        <div className="fixed inset-0 bg-black/25  z-50 flex items-center justify-center">
+          <div className="bg-white p-4 rounded w-[90vw] max-w-md">
+            <div className="relative w-full h-64 bg-gray-200">
+              <Cropper
+                image={imageSrc}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={(_, area) => setCroppedAreaPixels(area)}
+              />
+            </div>
+            <div className="flex justify-between mt-4">
+              <button
+                className="bg-gray-400 text-white px-4 py-2 rounded"
+                onClick={() => setShowCropper(false)}
+              >
+                Batal
+              </button>
+              <button
+                className="bg-blue-600 text-white px-4 py-2 rounded"
+                onClick={handleCropSave}
+              >
+                Simpan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-4 bg-white p-4 shadow rounded">
 
         <div className="flex flex-col items-center gap-4">
@@ -112,10 +171,7 @@ const ProfilePage = () => {
           <input
             type="file"
             accept="image/*"
-            onChange={(e) => {
-              setSelectedFile(e.target.files[0]);
-              setPreview(URL.createObjectURL(e.target.files[0]));
-            }}
+            onChange={handleFileChange}
             className="w-full border p-2 rounded"
           />
         </div>
